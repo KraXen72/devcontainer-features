@@ -1,6 +1,6 @@
 {
     "id": "go-minimal",
-    "version": "1.0.0",
+    "version": "1.0.1",
     "name": "Go (minimal, dnf)",
     "description": "Installs Go via dnf (Fedora/RHEL only), no extra tooling",
     "containerEnv": {
