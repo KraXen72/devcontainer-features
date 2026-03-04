@@ -9,5 +9,5 @@ else
     PKG="python${VERSION}"
 fi
 
-dnf install -y "$PKG" "${PKG}-pip" python-unversioned-command
+dnf install -y "$PKG" "${PKG}-pip" python-unversioned-command python3-devel python3-tkinter
 dnf clean all

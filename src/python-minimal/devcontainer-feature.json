@@ -1,6 +1,6 @@
 {
     "id": "python-minimal",
-    "version": "1.0.0",
+    "version": "1.0.1",
     "name": "Python (minimal, dnf)",
     "description": "Installs python3 and pip via dnf (Fedora only)",
     "options": {
