@@ -1,0 +1,6 @@
+{
+    "id": "chromium",
+    "version": "1.0.0",
+    "name": "Chromium",
+    "description": "Installs Chromium via dnf (Fedora/RHEL only)"
+}
