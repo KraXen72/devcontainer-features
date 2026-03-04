@@ -1,6 +1,6 @@
 {
     "id": "chromium-headless",
-    "version": "1.0.0",
+    "version": "1.0.1",
     "name": "Chromium (headless)",
     "description": "Installs Headless Chromium via dnf (Fedora/RHEL only)"
 }
