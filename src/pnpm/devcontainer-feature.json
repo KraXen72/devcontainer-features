@@ -1,0 +1,39 @@
+{
+    "id": "pnpm",
+    "version": "1.0.0",
+    "name": "pnpm (via npm)",
+    "documentationURL": "http://github.com/devcontainers-extra/features/tree/main/src/pnpm",
+    "description": "Installs pnpm via npm. Based on devcontainers-extra/features/pnpm .This feature does not install nodejs or npm.",
+    "options": {
+        "version": {
+            "default": "latest",
+            "description": "Select the version of pnpm to install.",
+            "proposals": [
+                "latest"
+            ],
+            "type": "string"
+        },
+        "configureMinimumReleaseAge": {
+            "default": true,
+            "description": "Run 'pnpm config set minimumReleaseAge 1440 --global'.",
+            "type": "boolean"
+        },
+        "minimumReleaseAge": {
+            "default": "1440",
+            "description": "Value for 'pnpm config set minimumReleaseAge <value> --global'.",
+            "type": "string"
+        },
+        "storeDir": {
+            "default": "~/.pnpm-store",
+            "description": "Directory where the pnpm store is exposed in the container.",
+            "type": "string"
+        }
+    },
+    "mounts": [
+        {
+            "source": "${devcontainerId}-pnpm-store",
+            "target": "/pnpm-store",
+            "type": "volume"
+        }
+    ]
+}

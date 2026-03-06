@@ -12,9 +12,14 @@ else
     TARGET_USER="${USERNAME}"
 fi
 
-user_home="$(eval echo "~${TARGET_USER}")"
+if ! [[ "${TARGET_USER}" =~ ^[a-z_][a-z0-9_-]*[$]?$ ]]; then
+    echo "ERROR: invalid username '${TARGET_USER}'."
+    exit 1
+fi
 
-if [ ! -d "$user_home" ]; then
+user_home="$(getent passwd "${TARGET_USER}" | cut -d: -f6)"
+
+if [ -z "$user_home" ] || [ ! -d "$user_home" ]; then
     user_home="/root"
     TARGET_USER="root"
 fi
