@@ -32,7 +32,7 @@ fi
 
 if [ "${STORE_DIR_RAW}" = "~" ]; then
     STORE_DIR="${USER_HOME}"
-elif [[ "${STORE_DIR_RAW}" == ~/* ]]; then
+elif [[ "${STORE_DIR_RAW}" == "~/"* ]]; then
     STORE_DIR="${USER_HOME}/${STORE_DIR_RAW#~/}"
 else
     STORE_DIR="${STORE_DIR_RAW}"
