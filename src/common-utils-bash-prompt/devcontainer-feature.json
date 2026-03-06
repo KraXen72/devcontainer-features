@@ -1,6 +1,6 @@
 {
     "id": "common-utils-bash-prompt",
-    "version": "1.0.0",
+    "version": "1.0.1",
     "name": "Common Utils Bash Prompt",
     "description": "Appends a common-utils-inspired Bash prompt theme to the target user's .bashrc"
 }
