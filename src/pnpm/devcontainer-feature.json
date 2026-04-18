@@ -1,9 +1,13 @@
 {
     "id": "pnpm",
-    "version": "1.0.1",
+    "version": "1.0.2",
     "name": "pnpm (via npm)",
     "documentationURL": "http://github.com/devcontainers-extra/features/tree/main/src/pnpm",
     "description": "Installs pnpm via npm. Based on devcontainers-extra/features/pnpm .This feature does not install nodejs or npm.",
+    "containerEnv": {
+        "PNPM_HOME": "${HOME}/.local/share/pnpm",
+        "PATH": "${PATH}:${HOME}/.local/share/pnpm"
+    },
     "options": {
         "version": {
             "default": "latest",
