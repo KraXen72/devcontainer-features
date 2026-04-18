@@ -1,45 +1,70 @@
-# creditd: https://github.com/devcontainers/features/blob/main/src/common-utils/scripts/bash_theme_snippet.sh
+# inspired by devcontainers common-utils / robbyrussell-style prompts
+# https://github.com/devcontainers/features/blob/main/src/common-utils/scripts/bash_theme_snippet.sh
 # which is inspired by/based on: https://github.com/ohmyzsh/ohmyzsh/blob/master/themes/robbyrussell.zsh-theme
-__bash_prompt() {
-    local userpart='`export XIT=$? \
-        && [ ! -z "${GITHUB_USER:-}" ] && echo -n "\[\033[0;32m\]@${GITHUB_USER:-} " || echo -n "\[\033[0;32m\]\u " \
-        && [ "$XIT" -ne "0" ] && echo -n "\[\033[1;31m\]➜" || echo -n "\[\033[0m\]➜"`'
-    local gitbranch='`\
-        if [ "$(git config --get devcontainers-theme.hide-status 2>/dev/null)" != 1 ] && [ "$(git config --get codespaces-theme.hide-status 2>/dev/null)" != 1 ]; then \
-            export BRANCH="$(git --no-optional-locks symbolic-ref --short HEAD 2>/dev/null || git --no-optional-locks rev-parse --short HEAD 2>/dev/null)"; \
-            if [ "${BRANCH:-}" != "" ]; then \
-                echo -n "\[\033[0;36m\](\[\033[1;31m\]${BRANCH:-}" \
-                && if [ "$(git config --get devcontainers-theme.show-dirty 2>/dev/null)" = 1 ] && \
-                    git --no-optional-locks ls-files --error-unmatch -m --directory --no-empty-directory -o --exclude-standard ":/*" > /dev/null 2>&1; then \
-                        echo -n " \[\033[1;33m\]✗"; \
-                fi \
-                && echo -n "\[\033[0;36m\]) "; \
-            fi; \
-        fi`'
-    local lightblue='\[\033[1;34m\]'
-    local removecolor='\[\033[0m\]'
-    PS1="${userpart} ${lightblue}\w ${gitbranch}${removecolor}\$ "
-    unset -f __bash_prompt
+
+__dc_git_branch() {
+    if [ "$(git config --get devcontainers-theme.hide-status 2>/dev/null)" = 1 ] ||
+       [ "$(git config --get codespaces-theme.hide-status 2>/dev/null)" = 1 ]; then
+        return
+    fi
+
+    local branch dirty=""
+    branch="$(git --no-optional-locks symbolic-ref --short HEAD 2>/dev/null ||
+              git --no-optional-locks rev-parse --short HEAD 2>/dev/null)" || return
+
+    [ -n "$branch" ] || return
+
+    if [ "$(git config --get devcontainers-theme.show-dirty 2>/dev/null)" = 1 ] &&
+       git --no-optional-locks ls-files --error-unmatch -m --directory --no-empty-directory -o --exclude-standard ":/*" >/dev/null 2>&1; then
+        dirty=" \[\033[1;33m\]✗"
+    fi
+
+    printf '\[\033[0;36m\](\[\033[1;31m\]%s%s\[\033[0;36m\]) ' "$branch" "$dirty"
 }
-__bash_prompt
-export PROMPT_DIRTRIM=4
 
-# Check if the terminal is xterm
-if [[ "$TERM" == "xterm" ]]; then
-    # Function to set the terminal title to the current command
-    preexec() {
-        local cmd="${BASH_COMMAND}"
-        echo -ne "\033]0;${USER}@${HOSTNAME}: ${cmd}\007"
+__dc_set_ps1() {
+    local xit=$?
+    local green='\[\033[0;32m\]'
+    local blue='\[\033[1;34m\]'
+    local red='\[\033[1;31m\]'
+    local reset='\[\033[0m\]'
+    local userpart arrow gitpart
+
+    if [ -n "${GITHUB_USER:-}" ]; then
+        userpart="${green}@${GITHUB_USER} "
+    else
+        userpart="${green}\u "
+    fi
+
+    if [ "$xit" -ne 0 ]; then
+        arrow="${red}➜"
+    else
+        arrow="${reset}➜"
+    fi
+
+    gitpart="$(__dc_git_branch)"
+    PS1="${userpart}${arrow} ${blue}\w ${gitpart}${reset}\$ "
+}
+
+PROMPT_DIRTRIM=4
+PROMPT_COMMAND="__dc_set_ps1${PROMPT_COMMAND:+; $PROMPT_COMMAND}"
+
+__dc_supports_title() {
+    case "${TERM:-}" in
+        xterm*|screen*|tmux*|rxvt*|alacritty*|foot*|kitty*) return 0 ;;
+        *) return 1 ;;
+    esac
+}
+
+if [[ $- == *i* ]] && __dc_supports_title; then
+    __dc_preexec() {
+        printf '\033]0;%s@%s: %s\007' "$USER" "${HOSTNAME%%.*}" "${BASH_COMMAND}"
     }
 
-    # Function to reset the terminal title to the shell type after the command is executed
-    precmd() {
-        echo -ne "\033]0;${USER}@${HOSTNAME}: ${SHELL}\007"
+    __dc_precmd() {
+        printf '\033]0;%s@%s: %s\007' "$USER" "${HOSTNAME%%.*}" "${PWD/#$HOME/\~}"
     }
 
-    # Trap DEBUG signal to call preexec before each command
-    trap 'preexec' DEBUG
-
-    # Append to PROMPT_COMMAND to call precmd before displaying the prompt
-    PROMPT_COMMAND="${PROMPT_COMMAND:+$PROMPT_COMMAND; }precmd"
+    trap '__dc_preexec' DEBUG
+    PROMPT_COMMAND="__dc_precmd${PROMPT_COMMAND:+; $PROMPT_COMMAND}"
 fi
