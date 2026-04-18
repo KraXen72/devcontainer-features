@@ -77,5 +77,11 @@ fi
 
 su - "${TARGET_USER}" -c "$(printf 'pnpm config set store-dir %q --global' "${STORE_DIR}")"
 
+cat > /etc/profile.d/pnpm.sh << EOF
+export PNPM_HOME="${USER_HOME}/.local/share/pnpm"
+export PATH="\${PNPM_HOME}:\${PATH}"
+EOF
+chmod +x /etc/profile.d/pnpm.sh
+
 echo "Done! pnpm installed and configured for ${TARGET_USER}."
 
