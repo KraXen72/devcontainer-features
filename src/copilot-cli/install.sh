@@ -1,0 +1,39 @@
+#!/bin/bash
+set -euo pipefail
+
+VERSION="${VERSION:-latest}"
+INSTALLER_URL="https://gh.io/copilot-install"
+PREFIX="/usr/local"
+
+if ! command -v curl >/dev/null 2>&1 && ! command -v wget >/dev/null 2>&1; then
+    echo "ERROR: curl or wget is required to install GitHub Copilot CLI."
+    exit 1
+fi
+
+if ! command -v tar >/dev/null 2>&1; then
+    echo "ERROR: tar is required to install GitHub Copilot CLI."
+    exit 1
+fi
+
+echo "Installing GitHub Copilot CLI (version: ${VERSION})..."
+
+if command -v curl >/dev/null 2>&1; then
+    TMP_INSTALLER="$(mktemp)"
+    trap 'rm -f -- "$TMP_INSTALLER"' EXIT
+    curl -fsSL "$INSTALLER_URL" -o "$TMP_INSTALLER"
+    env VERSION="$VERSION" PREFIX="$PREFIX" bash "$TMP_INSTALLER"
+else
+    TMP_INSTALLER="$(mktemp)"
+    trap 'rm -f -- "$TMP_INSTALLER"' EXIT
+    wget -qO "$TMP_INSTALLER" "$INSTALLER_URL"
+    env VERSION="$VERSION" PREFIX="$PREFIX" bash "$TMP_INSTALLER"
+fi
+
+if [ ! -x "${PREFIX}/bin/copilot" ]; then
+    echo "ERROR: ${PREFIX}/bin/copilot was not found after installation."
+    exit 1
+fi
+
+"${PREFIX}/bin/copilot" --version
+
+echo "Done! GitHub Copilot CLI installed successfully."
