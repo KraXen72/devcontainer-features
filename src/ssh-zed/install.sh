@@ -18,6 +18,5 @@ AllowUsers ${_REMOTE_USER}
 # No privilege separation: sshd runs in a single process and drops to the
 # remote user via setuid(). Requires SETUID+SETGID caps in runArgs.
 # No PAM: avoids AUDIT_WRITE and simplifies the cap surface further.
-UsePrivilegeSeparation no
 UsePAM no
 SSHD
