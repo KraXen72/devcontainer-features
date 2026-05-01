@@ -1,0 +1,6 @@
+{
+  "id": "ssh-zed",
+  "version": "1.0.0",
+  "name": "OpenSSH Server for Zed",
+  "description": "Configures sshd for Zed remote development. Requires openssh-server in the base image."
+}
