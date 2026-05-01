@@ -2,5 +2,5 @@
   "id": "ssh-zed",
   "version": "1.0.0",
   "name": "OpenSSH Server for Zed",
-  "description": "Configures sshd for Zed remote development. Requires openssh-server in the base image."
+  "description": "Configures sshd on port 2222 for Zed remote development. Requires openssh-server in the base image. The devcontainer runArgs must include --cap-add=SETUID and --cap-add=SETGID."
 }
