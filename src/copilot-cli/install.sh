@@ -2,7 +2,7 @@
 set -euo pipefail
 
 VERSION="${VERSION:-latest}"
-INSTALLER_URL="https://gh.io/copilot-install"
+INSTALLER_URL="https://raw.githubusercontent.com/github/copilot-cli/refs/heads/main/install.sh"
 PREFIX="/usr/local"
 
 if ! command -v curl >/dev/null 2>&1 && ! command -v wget >/dev/null 2>&1; then
