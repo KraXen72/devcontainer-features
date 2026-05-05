@@ -1,13 +1,13 @@
 
 # OpenSSH Server for Zed (ssh-zed)
 
-Configures sshd for Zed remote development. Requires openssh-server in the base image.
+Configures sshd on port 2222 for Zed remote development. If dropbear is in the base image, the feature will be faster due to not having to install it on its own.
 
 ## Example Usage
 
 ```json
 "features": {
-    "ghcr.io/kraxen72/devcontainer-features/ssh-zed:1": {}
+    "ghcr.io/kraxen72/devcontainer-features/ssh-zed:2": {}
 }
 ```
 
