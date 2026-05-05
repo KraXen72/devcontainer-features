@@ -37,7 +37,11 @@ fi
 
 echo "Done! GitHub Copilot CLI installed successfully."
 
-if [ "$VERSION" = "latest" ] || [ "$VERSION" = "prerelease" ]; then
-    mkdir -p /etc/devcontainer-copilot-cli
-    touch /etc/devcontainer-copilot-cli/auto-update
+if [ "${AUTOUPDATE:-false}" = "true" ]; then
+    if [ "$VERSION" = "latest" ] || [ "$VERSION" = "prerelease" ]; then
+        mkdir -p /etc/devcontainer-copilot-cli
+        touch /etc/devcontainer-copilot-cli/auto-update
+    else
+        echo "Warning: autoUpdate=true has no effect when version is pinned ('${VERSION}'). Auto-update will not run on container start."
+    fi
 fi

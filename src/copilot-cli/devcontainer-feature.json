@@ -1,6 +1,6 @@
 {
   "id": "copilot-cli",
-  "version": "1.2.0",
+  "version": "1.2.1",
   "name": "GitHub Copilot CLI",
   "description": "Installs GitHub Copilot CLI from the official release installer",
   "options": {
@@ -8,6 +8,11 @@
       "type": "string",
       "default": "latest",
       "description": "Copilot CLI version to install. Use 'latest', 'prerelease', or a specific version like '1.2.3' or 'v1.2.3'."
+    },
+    "autoUpdate": {
+      "type": "boolean",
+      "default": false,
+      "description": "Run 'copilot update' on each container start. Only useful when version is 'latest' or 'prerelease'."
     }
   },
   "postStartCommand": "[ -f /etc/devcontainer-copilot-cli/auto-update ] && copilot update --yes 2>/dev/null || true"
