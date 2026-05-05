@@ -17,17 +17,16 @@ fi
 
 echo "Installing GitHub Copilot CLI (version: ${VERSION})..."
 
+TMP_INSTALLER="$(mktemp)"
+trap 'rm -f -- "$TMP_INSTALLER"' EXIT
+
 if command -v curl >/dev/null 2>&1; then
-    TMP_INSTALLER="$(mktemp)"
-    trap 'rm -f -- "$TMP_INSTALLER"' EXIT
     curl -fsSL "$INSTALLER_URL" -o "$TMP_INSTALLER"
-    env VERSION="$VERSION" PREFIX="$PREFIX" bash "$TMP_INSTALLER"
 else
-    TMP_INSTALLER="$(mktemp)"
-    trap 'rm -f -- "$TMP_INSTALLER"' EXIT
     wget -qO "$TMP_INSTALLER" "$INSTALLER_URL"
-    env VERSION="$VERSION" PREFIX="$PREFIX" bash "$TMP_INSTALLER"
 fi
+
+env VERSION="$VERSION" PREFIX="$PREFIX" bash "$TMP_INSTALLER"
 
 if [ ! -x "${PREFIX}/bin/copilot" ]; then
     echo "ERROR: ${PREFIX}/bin/copilot was not found after installation."
