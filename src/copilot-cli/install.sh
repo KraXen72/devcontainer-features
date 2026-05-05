@@ -36,3 +36,8 @@ fi
 "${PREFIX}/bin/copilot" --version
 
 echo "Done! GitHub Copilot CLI installed successfully."
+
+if [ "$VERSION" = "latest" ] || [ "$VERSION" = "prerelease" ]; then
+    mkdir -p /etc/devcontainer-copilot-cli
+    touch /etc/devcontainer-copilot-cli/auto-update
+fi
