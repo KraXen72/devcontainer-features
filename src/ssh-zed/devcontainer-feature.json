@@ -1,6 +1,6 @@
 {
   "id": "ssh-zed",
-  "version": "2.0.0",
+  "version": "2.0.1",
   "name": "OpenSSH Server for Zed",
-  "description": "Configures sshd on port 2222 for Zed remote development. Requires openssh-server in the base image. The devcontainer runArgs must include --cap-add=SETUID and --cap-add=SETGID."
+  "description": "Configures sshd on port 2222 for Zed remote development. If dropbear is in the base image, the feature will be faster due to not having to install it on its own."
 }
