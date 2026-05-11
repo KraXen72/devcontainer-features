@@ -54,6 +54,9 @@ else
     npm install -g "pnpm@${VERSION}"
 fi
 
+PNPM_HOME_DIR="${USER_HOME}/.local/share/pnpm"
+PNPM_BIN_DIR="${PNPM_HOME_DIR}/bin"
+
 mkdir -p /pnpm-store
 chown -R "${TARGET_USER}:root" /pnpm-store || true
 
@@ -72,16 +75,15 @@ if [ "${CONFIGURE_MINIMUM_RELEASE_AGE}" = "true" ]; then
         echo "ERROR: minimumReleaseAge must be an integer number of minutes. Got: ${MINIMUM_RELEASE_AGE}"
         exit 1
     fi
-    su - "${TARGET_USER}" -c "$(printf 'pnpm config set minimumReleaseAge %q --global' "${MINIMUM_RELEASE_AGE}")"
+    su - "${TARGET_USER}" -c "export PNPM_HOME='${PNPM_HOME_DIR}'; export PATH='${PNPM_BIN_DIR}:${PNPM_HOME_DIR}':\$PATH; $(printf 'pnpm config set minimumReleaseAge %q --global' "${MINIMUM_RELEASE_AGE}")"
 fi
 
-su - "${TARGET_USER}" -c "$(printf 'pnpm config set store-dir %q --global' "${STORE_DIR}")"
+su - "${TARGET_USER}" -c "export PNPM_HOME='${PNPM_HOME_DIR}'; export PATH='${PNPM_BIN_DIR}:${PNPM_HOME_DIR}':\$PATH; $(printf 'pnpm config set store-dir %q --global' "${STORE_DIR}")"
 
 cat > /etc/profile.d/pnpm.sh << EOF
-export PNPM_HOME="${USER_HOME}/.local/share/pnpm"
-export PATH="\${PNPM_HOME}:\${PATH}"
+export PNPM_HOME="${PNPM_HOME_DIR}"
+export PATH="\${PNPM_HOME}/bin:\${PNPM_HOME}:\${PATH}"
 EOF
 chmod +x /etc/profile.d/pnpm.sh
 
 echo "Done! pnpm installed and configured for ${TARGET_USER}."
-
