@@ -1,8 +1,8 @@
 {
   "id": "copilot-cli",
-  "version": "1.3.0",
+  "version": "1.3.1",
   "name": "GitHub Copilot CLI",
-  "description": "Installs GitHub Copilot CLI from the official release installer",
+  "description": "Installs GitHub Copilot CLI from the official release installer. \n~/.copilot/settings.json must exist on host machine. Create it with: mkdir -p ~/.copilot && echo '{}' > ~/.copilot/settings.json",
   "options": {
     "version": {
       "type": "string",
