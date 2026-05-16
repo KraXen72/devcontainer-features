@@ -46,27 +46,5 @@ if [ "${AUTOUPDATE:-false}" = "true" ]; then
     fi
 fi
 
-# Ensure ~/.copilot/settings.json exists as a regular file so Docker can
-# bind-mount the host settings file onto it at container start. If it's left
-# as a symlink (e.g. from a dotfiles manager) or missing, Docker will create
-# a directory there instead of mounting the file, which breaks Copilot.
-REMOTE_USER="${_REMOTE_USER:-vscode}"
-COPILOT_DIR="/home/${REMOTE_USER}/.copilot"
-SETTINGS="$COPILOT_DIR/settings.json"
-
-mkdir -p "$COPILOT_DIR"
-
-if [ -L "$SETTINGS" ]; then
-    # Resolve through the symlink and replace with a real file.
-    RESOLVED=$(readlink -f "$SETTINGS" 2>/dev/null || true)
-    rm "$SETTINGS"
-    if [ -n "$RESOLVED" ] && [ -f "$RESOLVED" ]; then
-        cp "$RESOLVED" "$SETTINGS"
-    else
-        echo '{}' > "$SETTINGS"
-    fi
-elif [ ! -f "$SETTINGS" ]; then
-    echo '{}' > "$SETTINGS"
-fi
-
-chown -R "${REMOTE_USER}:root" "$COPILOT_DIR"
+# Note: ~/.copilot is mounted from the 'copilot-shared' Docker volume at runtime.
+# settings.json initialization happens in postStartCommand, not here.

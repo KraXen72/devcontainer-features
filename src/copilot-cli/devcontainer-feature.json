@@ -1,8 +1,8 @@
 {
   "id": "copilot-cli",
-  "version": "1.3.1",
+  "version": "1.4.0",
   "name": "GitHub Copilot CLI",
-  "description": "Installs GitHub Copilot CLI from the official release installer. \n~/.copilot/settings.json must exist on host machine. Create it with: mkdir -p ~/.copilot && echo '{}' > ~/.copilot/settings.json",
+  "description": "Installs GitHub Copilot CLI from the official release installer.\nSettings are shared across all containers via a named Docker volume (copilot-shared).",
   "options": {
     "version": {
       "type": "string",
@@ -17,10 +17,10 @@
   },
   "mounts": [
     {
-      "source": "${localEnv:HOME}/.copilot/settings.json",
-      "target": "/home/vscode/.copilot/settings.json",
-      "type": "bind"
+      "source": "copilot-shared",
+      "target": "/home/vscode/.copilot",
+      "type": "volume"
     }
   ],
-  "postStartCommand": "[ -f /etc/devcontainer-copilot-cli/auto-update ] && copilot update --yes 2>/dev/null || true"
+  "postStartCommand": "mkdir -p /home/vscode/.copilot && [ -f /home/vscode/.copilot/settings.json ] || echo '{}' > /home/vscode/.copilot/settings.json; [ -f /etc/devcontainer-copilot-cli/auto-update ] && copilot update --yes 2>/dev/null || true"
 }
