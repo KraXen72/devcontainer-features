@@ -78,11 +78,13 @@ if [ "${CONFIGURE_MINIMUM_RELEASE_AGE}" = "true" ]; then
     su - "${TARGET_USER}" -c "export PNPM_HOME='${PNPM_HOME_DIR}'; export PATH='${PNPM_BIN_DIR}:${PNPM_HOME_DIR}':\$PATH; $(printf 'pnpm config set minimumReleaseAge %q --global' "${MINIMUM_RELEASE_AGE}")"
 fi
 
+
+
 su - "${TARGET_USER}" -c "export PNPM_HOME='${PNPM_HOME_DIR}'; export PATH='${PNPM_BIN_DIR}:${PNPM_HOME_DIR}':\$PATH; $(printf 'pnpm config set store-dir %q --global' "${STORE_DIR}")"
 
-cat > /etc/profile.d/pnpm.sh << EOF
-export PNPM_HOME="${PNPM_HOME_DIR}"
-export PATH="\${PNPM_HOME}/bin:\${PNPM_HOME}:\${PATH}"
+cat > /etc/profile.d/pnpm.sh << 'EOF'
+export PNPM_HOME="${HOME}/.local/share/pnpm"
+export PATH="${PNPM_HOME}/bin:${PNPM_HOME}:${PATH}"
 EOF
 chmod +x /etc/profile.d/pnpm.sh
 
