@@ -34,8 +34,11 @@ auto_update_codex() {
     spec="$(cat "${TOOLS_DIR}/package-spec")"
     quoted_spec="$(printf '%q' "${spec}")"
 
-    run_as_target_user "export PNPM_HOME='${PNPM_HOME_DIR}'; export PATH='${PNPM_BIN_DIR}:${PNPM_HOME_DIR}':\$PATH; pnpm add --global ${quoted_spec} >/dev/null"
+    run_as_target_user "export PNPM_HOME='${PNPM_HOME_DIR}'; export PATH='${PNPM_BIN_DIR}:${PNPM_HOME_DIR}':\$PATH; pnpm add --global ${quoted_spec} >/dev/null && codex --version >/dev/null"
 }
 
-mkdir -p "${CODEX_HOME}"
+if ! mkdir -p "${CODEX_HOME}" 2>/dev/null; then
+    echo "Warning: Codex home ${CODEX_HOME} is not writable by ${TARGET_USER}; recreate the codex-shared volume." >&2
+    exit 0
+fi
 auto_update_codex || true

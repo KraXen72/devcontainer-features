@@ -1,6 +1,6 @@
 {
   "id": "copilot-cli",
-  "version": "1.4.0",
+  "version": "1.6.0",
   "name": "GitHub Copilot CLI",
   "description": "Installs GitHub Copilot CLI from the official release installer.\nSettings are shared across all containers via a named Docker volume (copilot-shared).",
   "options": {
@@ -22,5 +22,6 @@
       "type": "volume"
     }
   ],
-  "postStartCommand": "mkdir -p /home/vscode/.copilot && [ -f /home/vscode/.copilot/settings.json ] || echo '{}' > /home/vscode/.copilot/settings.json; [ -f /etc/devcontainer-copilot-cli/auto-update ] && copilot update --yes 2>/dev/null || true"
+  "postCreateCommand": "chown $(id -u vscode):$(id -g vscode) /home/vscode/.copilot && mkdir -p /home/vscode/.copilot && echo '{}' > /home/vscode/.copilot/settings.json",
+  "postStartCommand": "/usr/local/share/devcontainer-copilot-cli/post-start.sh"
 }

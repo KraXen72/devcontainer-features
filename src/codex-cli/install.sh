@@ -54,6 +54,7 @@ echo "Installing OpenAI Codex CLI (${PACKAGE_SPEC}) with pnpm..."
 mkdir -p "${PNPM_HOME_DIR}" "${PNPM_BIN_DIR}" "${USER_HOME}/.codex" "${TOOLS_DIR}"
 chown -R "${TARGET_USER}:${TARGET_GROUP}" "${PNPM_HOME_DIR}" "${USER_HOME}/.codex"
 
+rm -f "${PNPM_BIN_DIR}/codex"
 install_or_update_codex "${PACKAGE_SPEC}"
 
 if [ ! -x "${PNPM_BIN_DIR}/codex" ]; then
@@ -62,7 +63,7 @@ if [ ! -x "${PNPM_BIN_DIR}/codex" ]; then
 fi
 
 ln -sf "${PNPM_BIN_DIR}/codex" /usr/local/bin/codex
-codex --version || true
+run_as_target_user "export PNPM_HOME='${PNPM_HOME_DIR}'; export PATH='${PNPM_BIN_DIR}:${PNPM_HOME_DIR}':\$PATH; codex --version"
 
 if [ "${AUTO_UPDATE}" = "true" ]; then
     if is_exact_version "${VERSION}"; then

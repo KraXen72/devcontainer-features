@@ -1,5 +1,5 @@
 #!/bin/bash
-set -e
+set -euo pipefail
 
 VERSION="${VERSION:-latest}"
 CONFIGURE_MINIMUM_RELEASE_AGE="${CONFIGUREMINIMUMRELEASEAGE:-true}"
@@ -35,15 +35,60 @@ else
     npm install -g "pnpm@${VERSION}"
 fi
 
+install_pnpm_path_wrapper() {
+    local name="$1"
+    local bin="/usr/local/bin/${name}"
+    local real="/usr/local/bin/${name}-real"
+
+    if [ ! -e "${bin}" ]; then
+        return
+    fi
+
+    mv -f "${bin}" "${real}"
+    cat > "${bin}" << EOF
+#!/bin/sh
+# Keep pnpm globals/store under the container user's home even when the caller
+# inherited a host-side PNPM_HOME or runs from a non-login lifecycle shell.
+export PNPM_HOME="\${HOME}/.local/share/pnpm"
+export PATH="\${PNPM_HOME}/bin:\${PNPM_HOME}:\${PATH}"
+exec "${real}" "\$@"
+EOF
+    chmod +x "${bin}"
+}
+
+for pnpm_bin in pnpm pnpx pn pnx; do
+    install_pnpm_path_wrapper "${pnpm_bin}"
+done
+
 PNPM_HOME_DIR="${USER_HOME}/.local/share/pnpm"
 PNPM_BIN_DIR="${PNPM_HOME_DIR}/bin"
+PNPM_GLOBAL_DIR="${PNPM_HOME_DIR}/global"
+PNPM_STORE_DIR="${PNPM_HOME_DIR}/store"
+TARGET_GROUP="$(id -gn "${TARGET_USER}")"
+
+mkdir -p "${PNPM_BIN_DIR}" "${PNPM_GLOBAL_DIR}" "${PNPM_STORE_DIR}"
+chown -R "${TARGET_USER}:${TARGET_GROUP}" "${PNPM_HOME_DIR}"
+
+run_as_target_user() {
+    local command="$1"
+    if [ "${TARGET_USER}" = "root" ]; then
+        bash -lc "${command}"
+    else
+        su - "${TARGET_USER}" -c "${command}"
+    fi
+}
+
+pnpm_user_env="export PNPM_HOME='${PNPM_HOME_DIR}'; export PATH='${PNPM_BIN_DIR}:${PNPM_HOME_DIR}':\$PATH"
+run_as_target_user "${pnpm_user_env}; pnpm config set global-bin-dir '${PNPM_BIN_DIR}' --global"
+run_as_target_user "${pnpm_user_env}; pnpm config set global-dir '${PNPM_GLOBAL_DIR}' --global"
+run_as_target_user "${pnpm_user_env}; pnpm config set store-dir '${PNPM_STORE_DIR}' --global"
 
 if [ "${CONFIGURE_MINIMUM_RELEASE_AGE}" = "true" ]; then
     if ! [[ "${MINIMUM_RELEASE_AGE}" =~ ^[0-9]+$ ]]; then
         echo "ERROR: minimumReleaseAge must be an integer number of minutes. Got: ${MINIMUM_RELEASE_AGE}"
         exit 1
     fi
-    su - "${TARGET_USER}" -c "export PNPM_HOME='${PNPM_HOME_DIR}'; export PATH='${PNPM_BIN_DIR}:${PNPM_HOME_DIR}':\$PATH; $(printf 'pnpm config set minimumReleaseAge %q --global' "${MINIMUM_RELEASE_AGE}")"
+    run_as_target_user "${pnpm_user_env}; $(printf 'pnpm config set minimumReleaseAge %q --global' "${MINIMUM_RELEASE_AGE}")"
 fi
 
 # Single-quoted heredoc: ${HOME}, ${PNPM_HOME}, ${PATH} expand at shell startup
@@ -55,4 +100,8 @@ export PATH="${PNPM_HOME}/bin:${PNPM_HOME}:${PATH}"
 EOF
 chmod +x /etc/profile.d/pnpm.sh
 
-echo "Done! pnpm installed and configured for ${TARGET_USER}."
+echo "Installed pnpm $(pnpm --version) and configured globals for ${TARGET_USER}:"
+echo "  PNPM_HOME=${PNPM_HOME_DIR}"
+echo "  global-bin-dir=${PNPM_BIN_DIR}"
+echo "  global-dir=${PNPM_GLOBAL_DIR}"
+echo "  store-dir=${PNPM_STORE_DIR}"
