@@ -2,7 +2,8 @@
 # GitHub Copilot CLI (copilot-cli)
 
 Installs GitHub Copilot CLI from the official release installer.
-Settings are shared across all containers via a named Docker volume (copilot-shared).
+Copilot CLI state is shared across containers via a named Docker volume (copilot-shared).
+This feature never bind-mounts host ~/.copilot and does not create or copy settings.json; authenticate with COPILOT_GITHUB_TOKEN or the CLI's normal auth flow inside the shared volume.
 
 ## Example Usage
 

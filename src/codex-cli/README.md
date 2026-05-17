@@ -9,11 +9,7 @@ When this feature is used through dcman, dcman copies host ~/.codex/auth.json in
 
 ```json
 "features": {
-    "ghcr.io/kraxen72/devcontainer-features/pnpm:1": {},
-    "ghcr.io/kraxen72/devcontainer-features/codex-cli:1": {
-        "version": "latest",
-        "autoUpdate": true
-    }
+    "ghcr.io/kraxen72/devcontainer-features/codex-cli:1": {}
 }
 ```
 
