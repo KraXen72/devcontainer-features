@@ -1,7 +1,7 @@
 
 # pnpm (via npm) (pnpm)
 
-Installs pnpm via npm. Based on devcontainers-extra/features/pnpm .This feature does not install nodejs or npm.
+Installs pnpm via npm. Based on devcontainers-extra/features/pnpm. This feature does not install nodejs or npm.
 
 ## Example Usage
 
@@ -16,9 +16,8 @@ Installs pnpm via npm. Based on devcontainers-extra/features/pnpm .This feature 
 | Options Id | Description | Type | Default Value |
 |-----|-----|-----|-----|
 | version | Select the version/range of pnpm to install (for example, '10' to stay on the latest pnpm v10). | string | latest |
-| configureMinimumReleaseAge | Run 'pnpm config set minimumReleaseAge 1440 --global'. | boolean | true |
+| configureMinimumReleaseAge | Run 'pnpm config set minimumReleaseAge --global'. No-op on v11+ which already defaults to 1440, but useful for v10. | boolean | true |
 | minimumReleaseAge | Value for 'pnpm config set minimumReleaseAge <value> --global'. | string | 1440 |
-| storeDir | Directory where the pnpm store is exposed in the container. | string | ~/.pnpm-store |
 
 
 

@@ -1,8 +1,8 @@
 
 # GitHub Copilot CLI (copilot-cli)
 
-Installs GitHub Copilot CLI from the official release installer. 
-~/.copilot/settings.json must exist on host machine. Create it with: mkdir -p ~/.copilot && echo '{}' > ~/.copilot/settings.json
+Installs GitHub Copilot CLI from the official release installer.
+Settings are shared across all containers via a named Docker volume (copilot-shared).
 
 ## Example Usage
 

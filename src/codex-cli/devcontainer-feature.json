@@ -1,0 +1,29 @@
+{
+  "id": "codex-cli",
+  "version": "1.0.0",
+  "name": "OpenAI Codex CLI",
+  "description": "Installs OpenAI Codex CLI globally with pnpm.\nCodex state is stored in a persistent container-side ~/.codex volume.\nWhen this feature is used through dcman, dcman copies host ~/.codex/auth.json into that volume before launching Codex. This lets Codex reuse a host ChatGPT/device-login session without requiring an API key, while avoiding a long-lived host ~/.codex bind mount inside the sandboxed container.",
+  "options": {
+    "version": {
+      "type": "string",
+      "default": "latest",
+      "description": "Codex CLI npm version, dist-tag, or range to install for @openai/codex, for example 'latest', 'alpha', or '0.130.0'."
+    },
+    "autoUpdate": {
+      "type": "boolean",
+      "default": true,
+      "description": "Run 'pnpm add --global @openai/codex@<version>' on each container start when version is not pinned to an exact version."
+    }
+  },
+  "installsAfter": [
+    "ghcr.io/kraxen72/devcontainer-features/pnpm"
+  ],
+  "mounts": [
+    {
+      "source": "codex-shared",
+      "target": "/home/vscode/.codex",
+      "type": "volume"
+    }
+  ],
+  "postStartCommand": "/usr/local/share/devcontainer-codex-cli/post-start.sh"
+}
