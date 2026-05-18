@@ -35,39 +35,18 @@ else
     npm install -g "pnpm@${VERSION}"
 fi
 
-install_pnpm_path_wrapper() {
-    local name="$1"
-    local bin="/usr/local/bin/${name}"
-    local real="/usr/local/bin/${name}-real"
-
-    if [ ! -e "${bin}" ]; then
-        return
-    fi
-
-    mv -f "${bin}" "${real}"
-    cat > "${bin}" << EOF
-#!/bin/sh
-# Keep pnpm globals/store under the container user's home even when the caller
-# inherited a host-side PNPM_HOME or runs from a non-login lifecycle shell.
-export PNPM_HOME="\${HOME}/.local/share/pnpm"
-export PATH="\${PNPM_HOME}/bin:\${PNPM_HOME}:\${PATH}"
-exec "${real}" "\$@"
-EOF
-    chmod +x "${bin}"
-}
-
-for pnpm_bin in pnpm pnpx pn pnx; do
-    install_pnpm_path_wrapper "${pnpm_bin}"
-done
-
 PNPM_HOME_DIR="${USER_HOME}/.local/share/pnpm"
 PNPM_BIN_DIR="${PNPM_HOME_DIR}/bin"
 PNPM_GLOBAL_DIR="${PNPM_HOME_DIR}/global"
 PNPM_STORE_DIR="${PNPM_HOME_DIR}/store"
 TARGET_GROUP="$(id -gn "${TARGET_USER}")"
 
-mkdir -p "${PNPM_BIN_DIR}" "${PNPM_GLOBAL_DIR}" "${PNPM_STORE_DIR}"
-chown -R "${TARGET_USER}:${TARGET_GROUP}" "${PNPM_HOME_DIR}"
+install -d -o "${TARGET_USER}" -g "${TARGET_GROUP}" \
+    "${USER_HOME}/.local" \
+    "${USER_HOME}/.local/share" \
+    "${PNPM_BIN_DIR}" \
+    "${PNPM_GLOBAL_DIR}" \
+    "${PNPM_STORE_DIR}"
 
 run_as_target_user() {
     local command="$1"
@@ -92,8 +71,8 @@ if [ "${CONFIGURE_MINIMUM_RELEASE_AGE}" = "true" ]; then
 fi
 
 # Single-quoted heredoc: ${HOME}, ${PNPM_HOME}, ${PATH} expand at shell startup
-# inside the container, not at install time. Covers both v10 (globals in PNPM_HOME)
-# and v11 (globals in PNPM_HOME/bin). Store defaults to PNPM_HOME/store on both.
+# inside the container, not at install time. Covers both v10 globals in PNPM_HOME
+# and v11 globals in PNPM_HOME/bin.
 cat > /etc/profile.d/pnpm.sh << 'EOF'
 export PNPM_HOME="${HOME}/.local/share/pnpm"
 export PATH="${PNPM_HOME}/bin:${PNPM_HOME}:${PATH}"
