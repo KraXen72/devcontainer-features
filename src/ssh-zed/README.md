@@ -1,7 +1,7 @@
 
-# OpenSSH Server for Zed (ssh-zed)
+# Zed SSH for Dropbear (ssh-zed)
 
-Configures sshd on port 2222 for Zed remote development. If dropbear is in the base image, the feature will be faster due to not having to install it on its own.
+Configures Dropbear on port 2222 for Zed remote development. Also installs the SFTP helper Zed expects for file and extension sync.
 
 ## Example Usage
 
