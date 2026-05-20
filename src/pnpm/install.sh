@@ -38,15 +38,20 @@ fi
 PNPM_HOME_DIR="${USER_HOME}/.local/share/pnpm"
 PNPM_BIN_DIR="${PNPM_HOME_DIR}/bin"
 PNPM_GLOBAL_DIR="${PNPM_HOME_DIR}/global"
-PNPM_STORE_DIR="${PNPM_HOME_DIR}/store"
+PNPM_STORE_DIR="/var/lib/pnpm-store"
 TARGET_GROUP="$(id -gn "${TARGET_USER}")"
 
 install -d -o "${TARGET_USER}" -g "${TARGET_GROUP}" \
     "${USER_HOME}/.local" \
     "${USER_HOME}/.local/share" \
     "${PNPM_BIN_DIR}" \
-    "${PNPM_GLOBAL_DIR}" \
-    "${PNPM_STORE_DIR}"
+    "${PNPM_GLOBAL_DIR}"
+
+# Store lives at a fixed system path so host and container record the same
+# string in node_modules/.modules.yaml, preventing spurious reinstall prompts.
+# The container's /var/lib is not bind-mounted, so it is physically isolated
+# from the host store at the same path.
+install -d -o "${TARGET_USER}" -g "${TARGET_GROUP}" "${PNPM_STORE_DIR}"
 
 run_as_target_user() {
     local command="$1"
@@ -61,6 +66,11 @@ pnpm_user_env="export PNPM_HOME='${PNPM_HOME_DIR}'; export PATH='${PNPM_BIN_DIR}
 run_as_target_user "${pnpm_user_env}; pnpm config set global-bin-dir '${PNPM_BIN_DIR}' --global"
 run_as_target_user "${pnpm_user_env}; pnpm config set global-dir '${PNPM_GLOBAL_DIR}' --global"
 run_as_target_user "${pnpm_user_env}; pnpm config set store-dir '${PNPM_STORE_DIR}' --global"
+# Always copy files from the store into node_modules rather than hard-linking
+# or reflink-ing. This makes node_modules self-contained: if the container
+# shuts down, the bind-mounted project directory is left with a fully intact
+# node_modules that the host can continue using without any store references.
+run_as_target_user "${pnpm_user_env}; pnpm config set package-import-method copy --global"
 
 if [ "${CONFIGURE_MINIMUM_RELEASE_AGE}" = "true" ]; then
     if ! [[ "${MINIMUM_RELEASE_AGE}" =~ ^[0-9]+$ ]]; then
@@ -84,3 +94,4 @@ echo "  PNPM_HOME=${PNPM_HOME_DIR}"
 echo "  global-bin-dir=${PNPM_BIN_DIR}"
 echo "  global-dir=${PNPM_GLOBAL_DIR}"
 echo "  store-dir=${PNPM_STORE_DIR}"
+echo "  package-import-method=copy"
