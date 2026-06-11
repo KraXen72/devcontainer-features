@@ -2,7 +2,7 @@
   "id": "codex-cli",
   "version": "2.0.0",
   "name": "OpenAI Codex CLI",
-  "description": "Installs OpenAI Codex CLI globally with pnpm.\nCodex state is stored in a persistent container-side ~/.codex volume.\nWhen this feature is used through dcman, dcman copies host ~/.codex/auth.json into that volume before launching Codex. This lets Codex reuse a host ChatGPT/device-login session without requiring an API key, while avoiding a long-lived host ~/.codex bind mount inside the sandboxed container.",
+  "description": "Installs OpenAI Codex CLI globally with npm.\nCodex state is stored in a persistent container-side ~/.codex volume.\nWhen this feature is used through dcman, dcman copies host ~/.codex/auth.json into that volume before launching Codex. This lets Codex reuse a host ChatGPT/device-login session without requiring an API key, while avoiding a long-lived host ~/.codex bind mount inside the sandboxed container.",
   "options": {
     "version": {
       "type": "string",
@@ -15,9 +15,6 @@
       "description": "TOML snippet appended to the default ~/.codex/config.toml. Last-value-wins for duplicate keys. Example: '[tui.keymap.editor]\\ndelete_backward_word = \"ctrl-w\"'"
     }
   },
-  "installsAfter": [
-    "ghcr.io/kraxen72/devcontainer-features/pnpm"
-  ],
   "mounts": [
     {
       "source": "codex-shared",

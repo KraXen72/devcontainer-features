@@ -1,7 +1,7 @@
 
 # OpenAI Codex CLI (codex-cli)
 
-Installs OpenAI Codex CLI globally with pnpm.
+Installs OpenAI Codex CLI globally with npm.
 Codex state is stored in a persistent container-side ~/.codex volume.
 When this feature is used through dcman, dcman copies host ~/.codex/auth.json into that volume before launching Codex. This lets Codex reuse a host ChatGPT/device-login session without requiring an API key, while avoiding a long-lived host ~/.codex bind mount inside the sandboxed container.
 
