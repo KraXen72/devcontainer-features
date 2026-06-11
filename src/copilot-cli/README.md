@@ -9,7 +9,7 @@ This feature never bind-mounts host ~/.copilot and does not create or copy setti
 
 ```json
 "features": {
-    "ghcr.io/kraxen72/devcontainer-features/copilot-cli:1": {}
+    "ghcr.io/kraxen72/devcontainer-features/copilot-cli:2": {}
 }
 ```
 
@@ -18,7 +18,6 @@ This feature never bind-mounts host ~/.copilot and does not create or copy setti
 | Options Id | Description | Type | Default Value |
 |-----|-----|-----|-----|
 | version | Copilot CLI version to install. Use 'latest', 'prerelease', or a specific version like '1.2.3' or 'v1.2.3'. | string | latest |
-| autoUpdate | Run 'copilot update' on each container start. Only useful when version is 'latest' or 'prerelease'. | boolean | true |
 
 
 

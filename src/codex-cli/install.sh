@@ -2,7 +2,6 @@
 set -euo pipefail
 
 VERSION="${VERSION:-latest}"
-AUTO_UPDATE="${AUTOUPDATE:-true}"
 PACKAGE="@openai/codex"
 TOOLS_DIR="/usr/local/share/devcontainer-codex-cli"
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
@@ -46,12 +45,8 @@ install_or_update_codex() {
     run_as_target_user "export PNPM_HOME='${PNPM_HOME_DIR}'; export PATH='${PNPM_BIN_DIR}:${PNPM_HOME_DIR}':\$PATH; pnpm add --global ${quoted_spec}"
 }
 
-is_exact_version() {
-    [[ "$1" =~ ^v?[0-9]+\.[0-9]+\.[0-9]+([-.+][0-9A-Za-z.-]+)?$ ]]
-}
-
 echo "Installing OpenAI Codex CLI (${PACKAGE_SPEC}) with pnpm..."
-mkdir -p "${PNPM_HOME_DIR}" "${PNPM_BIN_DIR}" "${USER_HOME}/.codex" "${TOOLS_DIR}"
+mkdir -p "${PNPM_HOME_DIR}" "${PNPM_BIN_DIR}" "${USER_HOME}/.codex"
 chown -R "${TARGET_USER}:${TARGET_GROUP}" "${PNPM_HOME_DIR}" "${USER_HOME}/.codex"
 
 rm -f "${PNPM_BIN_DIR}/codex"
@@ -65,19 +60,14 @@ fi
 ln -sf "${PNPM_BIN_DIR}/codex" /usr/local/bin/codex
 run_as_target_user "export PNPM_HOME='${PNPM_HOME_DIR}'; export PATH='${PNPM_BIN_DIR}:${PNPM_HOME_DIR}':\$PATH; codex --version"
 
-if [ "${AUTO_UPDATE}" = "true" ]; then
-    if is_exact_version "${VERSION}"; then
-        echo "Warning: autoUpdate=true has no effect when version is pinned ('${VERSION}'). Auto-update will not run on container start."
-        rm -f "${TOOLS_DIR}/auto-update" "${TOOLS_DIR}/package-spec"
-    else
-        printf '%s\n' "${PACKAGE_SPEC}" > "${TOOLS_DIR}/package-spec"
-        touch "${TOOLS_DIR}/auto-update"
-    fi
-else
-    rm -f "${TOOLS_DIR}/auto-update" "${TOOLS_DIR}/package-spec"
+CONFIG_SOURCE="${SCRIPT_DIR}/config-overrride.toml"
+FINAL_CONFIG="$(cat "${CONFIG_SOURCE}")"
+if [ -n "${CONFIGOVERRIDE:-}" ]; then
+    FINAL_CONFIG="${FINAL_CONFIG}"$'\n'"${CONFIGOVERRIDE}"
 fi
-
-cp "${SCRIPT_DIR}/post-start.sh" "${TOOLS_DIR}/post-start.sh"
-chmod +x "${TOOLS_DIR}/post-start.sh"
+printf '%s\n' "${FINAL_CONFIG}" > "${USER_HOME}/.codex/config.toml"
+chown "${TARGET_USER}:${TARGET_GROUP}" "${USER_HOME}/.codex/config.toml"
+mkdir -p "${TOOLS_DIR}"
+cp "${USER_HOME}/.codex/config.toml" "${TOOLS_DIR}/codex-config.toml"
 
 echo "Done! OpenAI Codex CLI installed successfully."

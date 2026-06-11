@@ -1,0 +1,3 @@
+[tui.keymap.editor]
+delete_backward = "backspace"
+delete_backward_word = "ctrl-h"

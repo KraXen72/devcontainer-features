@@ -1,6 +1,6 @@
 {
   "id": "copilot-cli",
-  "version": "1.7.0",
+  "version": "2.0.0",
   "name": "GitHub Copilot CLI",
   "description": "Installs GitHub Copilot CLI from the official release installer.\nCopilot CLI state is shared across containers via a named Docker volume (copilot-shared).\nThis feature never bind-mounts host ~/.copilot and does not create or copy settings.json; authenticate with COPILOT_GITHUB_TOKEN or the CLI's normal auth flow inside the shared volume.",
   "options": {
@@ -8,11 +8,6 @@
       "type": "string",
       "default": "latest",
       "description": "Copilot CLI version to install. Use 'latest', 'prerelease', or a specific version like '1.2.3' or 'v1.2.3'."
-    },
-    "autoUpdate": {
-      "type": "boolean",
-      "default": true,
-      "description": "Run 'copilot update' on each container start. Only useful when version is 'latest' or 'prerelease'."
     }
   },
   "mounts": [
@@ -21,6 +16,5 @@
       "target": "/home/vscode/.copilot",
       "type": "volume"
     }
-  ],
-  "postStartCommand": "/usr/local/share/devcontainer-copilot-cli/post-start.sh"
+  ]
 }

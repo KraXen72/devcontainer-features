@@ -9,7 +9,7 @@ When this feature is used through dcman, dcman copies host ~/.codex/auth.json in
 
 ```json
 "features": {
-    "ghcr.io/kraxen72/devcontainer-features/codex-cli:1": {}
+    "ghcr.io/kraxen72/devcontainer-features/codex-cli:2": {}
 }
 ```
 
@@ -18,7 +18,7 @@ When this feature is used through dcman, dcman copies host ~/.codex/auth.json in
 | Options Id | Description | Type | Default Value |
 |-----|-----|-----|-----|
 | version | Codex CLI npm version, dist-tag, or range to install for @openai/codex, for example 'latest', 'alpha', or '0.130.0'. | string | latest |
-| autoUpdate | Run 'pnpm add --global @openai/codex@<version>' on each container start when version is not pinned to an exact version. | boolean | true |
+| configOverride | TOML snippet appended to the default ~/.codex/config.toml. Last-value-wins for duplicate keys. | string | (empty) |
 
 
 
