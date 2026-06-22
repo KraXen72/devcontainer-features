@@ -52,11 +52,7 @@ ln -sfn "${VOLUME_DIR}/state"  "${USER_HOME}/.local/state/opencode"
 cat > "${USER_HOME}/.config/opencode/opencode-yolo.json" << 'EOF'
 {
   "$schema": "https://opencode.ai/config.json",
-  "permission": {
-    "*": {
-      "*": "allow"
-    }
-  }
+  "permission": "allow"
 }
 EOF
 
